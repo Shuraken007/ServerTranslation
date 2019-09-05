@@ -1,0 +1,8 @@
+1. You need Mysql Server
+2. Install python 2.7
+3. Install previous vers of mysql-connector
+pip install mysql-connector==2.1.6 for python 2.7
+4. Install libs which CreateDb need: configparser, yandex_translate
+5. Fill Config.txt, main fields:
+user, password, mangos_db
+6. If you want use funcs copy_tables and fill_locale_db - you should load mangos database from CMangos (check github)

@@ -1,0 +1,27 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+
+ <Include file="creature_template\Name.lua"/>
+ <Include file="creature_template\SubName.lua"/>
+ <Include file="points_of_interest.lua"/>
+ <Include file="creature_ai_texts.lua"/>
+ <Include file="page_text.lua"/>
+ <Include file="script_texts.lua"/>
+ <Include file="gossip_texts.lua"/>
+ <Include file="gossip_menu_option.lua"/>
+ <Include file="areatrigger_teleport.lua"/>
+ <Include file="item_template\name.lua"/>
+ <Include file="item_template\description.lua"/>
+ <Include file="dbscript_string.lua"/>
+ <Include file="quest_template\title.lua"/>
+ <Include file="quest_template\RequestItemsText.lua"/>
+ <Include file="quest_template\EndText.lua"/>
+ <Include file="quest_template\ObjectiveText.lua"/>
+ <Include file="quest_template\details.lua"/>
+ <Include file="quest_template\objectives.lua"/>
+ <Include file="quest_template\OfferRewardText.lua"/>
+ <Include file="questgiver_greeting.lua"/>
+ <Include file="gameobject_template.lua"/>
+ <Include file="npc_text\text.lua"/>
+ <Include file="mangos_string.lua"/>
+</Ui>
