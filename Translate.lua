@@ -171,7 +171,7 @@ ServTr.Translator = {
 	end,
 
 	Translate = function(self, text, data, method, object)
-		if ServTr.ImaginaryModeOff then return nil end
+		if ServTr.db.profile.ImaginaryModeOff then return nil end
 		self:Constructor(method, object)
 		local dataI = ServTr:GetTableI(data) --integer part of table
 		local result

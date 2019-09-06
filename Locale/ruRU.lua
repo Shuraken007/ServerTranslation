@@ -164,8 +164,7 @@ if GetLocale() == "ruRU" then
 		return nil
 	end
 
-	BINDING_NAME_TRANSLATE = "Перевод вкл/выкл"
-	BINDING_HEADER_SERVTR = "Server Translation"
+	BINDING_NAME_TRANSLATE = "Переключить перевод"
 
 	EMOTE_LIST = {
 		"%s соглашается с %s.",

@@ -1,5 +1,5 @@
 <Bindings>
-   <Binding name="TRANSLATE" header="SERVTR">
-      ServTr:OnlineTranslate();
-   </Binding>
+	<Binding name = 'TRANSLATE' header = 'Server Translation'>
+		ServTr:OnlineTranslate();
+	</Binding>
 </Bindings>

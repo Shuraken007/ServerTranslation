@@ -28,7 +28,8 @@ function ServTr:OnInitialize(name)
 		bubbles = .01,
 		api = {
 			['*'] = false
-		}
+		},
+		ImaginaryModeOff = false,
 	})
 	self:RegisterEvent('ADDON_LOADED')
 	self.ScheduleEvents = {}
@@ -126,7 +127,6 @@ end
 
 -- I(iterate) if table have string keys then return false else it's iterate table - true
 function ServTr:IsTableI(tab)
-   if not tab then return nil end
    for k, _ in pairs(tab) do
       if type(k) == 'string' then
          return false
@@ -136,7 +136,6 @@ function ServTr:IsTableI(tab)
 end
 
 function ServTr:GetTableI(tab)
-   if not tab then return nil end
    if type(tab) == 'string' then
    	tab = {tab}
    end
@@ -408,7 +407,7 @@ function ServTr:Nameplate_Update()
 	for _, f in pairs(childs) do
 		if not f.frame and self:GetNoNameFrame(f) == 'NameplateFrame' then
 			local _, _, Name = f:GetRegions()
-			if self.ImaginaryModeOff then
+			if self.db.profile.ImaginaryModeOff then
 				if f.restore then
 					Name:SetText(f.restore)
 					f.restore = nil
@@ -477,7 +476,7 @@ ServTr.RestoreTooltipData = {}
 
 function ServTr:GameTooltip()
 	--info to restore tooltip with out using this func
-	ServTr.GT_PrevVal = {}
+	self.GT_PrevVal = {}
 
 	--s = GameTooltip start line
 	--f = GameTooltip finish line
@@ -516,8 +515,8 @@ function ServTr:GameTooltip()
 				end
 				if replace then
 					if not r_flag then
-						ServTr.RestoreTooltipData.GameTooltip = {}
-						ServTr.GT_PrevVal = {}
+						self.RestoreTooltipData.GameTooltip = {}
+						self.GT_PrevVal = {}
 					end
 					self.RestoreTooltipData.GameTooltip[i] = text
 					self.GT_PrevVal[i] = replace
@@ -560,7 +559,7 @@ function ServTr:ItemTooltip(tooltip)
 				end
 				if replace then
 					if not r_flag then
-						ServTr.RestoreTooltipData[tooltip] = {}
+						self.RestoreTooltipData[tooltip] = {}
 					end
 					self.RestoreTooltipData[tooltip][i] = text
 					r_flag = true
@@ -615,8 +614,8 @@ function ServTr:RestoreTooltips()
 end
 
 function ServTr:OnlineTranslate()
-	ServTr.ImaginaryModeOff = not ServTr.ImaginaryModeOff
-	ServTr:RestoreTooltips()
+	self.db.profile.ImaginaryModeOff = not self.db.profile.ImaginaryModeOff
+	self:RestoreTooltips()
 	self.CallStack:call_all()
 
 	--self:UpdateVisibleTooltips()

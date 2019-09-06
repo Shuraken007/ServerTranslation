@@ -17,13 +17,13 @@ ServTr.AUCTION_SUBJECT_list = {
 	AUCTION_SOLD_MAIL_SUBJECT = {{ITEM_BONUS = {'item_name'}}}
 }
 
--- ServTr.CHAT_MSG_SYSTEM_list = {
--- 	ERR_QUEST_ACCEPTED_S = 'quest_title',
--- 	ERR_QUEST_COMPLETE_S = 'quest_title',
--- 	ERR_QUEST_FAILED_S = 'quest_title',
--- 	ERR_QUEST_REWARD_ITEM_S = 'item_name',
--- 	ERR_AUCTION_WON_S = {'item_name', ITEM_BONUS = {'item_name'}}
--- }
+ServTr.CHAT_MSG_SYSTEM_list = {
+	ERR_QUEST_ACCEPTED_S = 'quest_title',
+	ERR_QUEST_COMPLETE_S = 'quest_title',
+	ERR_QUEST_FAILED_S = 'quest_title',
+	ERR_QUEST_REWARD_ITEM_S = 'item_name',
+	ERR_AUCTION_WON_S = {'item_name', ITEM_BONUS = {'item_name'}}
+}
 
 ServTr.QUESTLOG_MESSAGE_list = {
 	'quest_EndText',

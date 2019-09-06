@@ -152,6 +152,5 @@ L:RegisterTranslations('enUS', function() return {
 if GetLocale() == "enUS" then
 	EMOTE_LIST = {}
 	strlower_hook = function(letter) return nil end
-	BINDING_NAME_TRANSLATE = "Translation"
-	BINDING_HEADER_SERVTR = "Server Translation"
+	BINDING_NAME_TRANSLATE = "Toggle translation"
 end
