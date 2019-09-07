@@ -7,14 +7,14 @@ ServTrFu.hasIcon = 'Interface\\Icons\\inv_misc_note_04'
 
 function ServTrFu:OnInitialize()
 	self:RegisterDB('STFu_DB')
-	
-	self.title = 'Server Translation '..GetAddOnMetadata('Server_Translation', 'Version')
+
+	self.title = 'Server Translation '..GetAddOnMetadata('ServerTranslation', 'Version')
 	self.titleWhenTooltipDetached = true
 	self.defaultMinimapPosition = 180
 	self.clickableTooltip = true
 	self.cannotHideText = true
 	self.hasNoColor = true
-	
+
 	self.OnMenuRequest = ServTr.options
 	local args = AceLibrary('FuBarPlugin-2.0'):GetAceOptionsDataTable(self)
 	for k, v in pairs(args) do

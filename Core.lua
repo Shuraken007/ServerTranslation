@@ -1,44 +1,48 @@
 ﻿local _G = getfenv()
 
-ServTr = AceLibrary('AceAddon-2.0'):new('AceEvent-2.0', 'AceConsole-2.0', 'AceDB-2.0', 'AceHook-2.1')
-local L = AceLibrary('AceLocale-2.2'):new('ServTr')
+ServTr = LibStub("AceAddon-3.0"):NewAddon("ServTr", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
+local L = LibStub("AceLocale-3.0"):GetLocale('ServTr')
 
 function ServTr:OnInitialize(name)
-	ChatFrame1:AddMessage('Server Translation v'..GetAddOnMetadata('Server_Translation', 'Version')..L[" loaded. Type /servtr for help."], 0.6, 0.8, 0.9)
-	self:RegisterDB('ST_DB')
-	self:RegisterDefaults('profile', {
-		translation = {
-			['*'] = {
+	ChatFrame1:AddMessage('Server Translation v'..GetAddOnMetadata('ServerTranslation', 'Version')..L[" loaded. Type /servtr for help."], 0.6, 0.8, 0.9)
+	local defaults = {
+		profile = {
+			translation = {
+				['*'] = {
+					['*'] = true
+				},
+				objects = {
+					['*'] = {
+						['*'] = {
+							['*'] = true
+						}
+					},
+				}
+			},
+			db = {
 				['*'] = true
 			},
-			objects = {
-				['*'] = {
-					['*'] = {
-						['*'] = true
-					}
-				},
-			}
-		},
-		db = {
-			['*'] = true
-		},
-		ruRU = true,
-		language = 'ruRU',
-		nameplates = 1,
-		bubbles = .01,
-		api = {
-			['*'] = false
-		},
-		ImaginaryModeOff = false,
-	})
+			ruRU = true,
+			language = 'ruRU',
+			nameplates = 1,
+			bubbles = .01,
+			api = {
+				['*'] = false
+			},
+			ImaginaryModeOff = false,
+		}
+	}
+
+	self.db = LibStub("AceDB-3.0"):New("ST_DB", defaults, true)
 	self:RegisterEvent('ADDON_LOADED')
-	self.ScheduleEvents = {}
+	self.ScheduleTimers = {}
 end
 
 function ServTr:OnEnable()
 	self:LoadDb()
+	LibStub("AceConfig-3.0"):RegisterOptionsTable("ServTr", self.options, "servtr")
 
-	self:RegisterChatCommand({'/servtr', '/servertranslation'}, self.options)
+	-- self:RegisterChatCommand({'/servtr', '/servertranslation'}, self.options)
 	self:HookScript(GameTooltip, 'OnShow', function() self:TooltipOnUpdate() end)
 	self:HookScript(GameTooltip, 'OnSizeChanged', function() self:TooltipOnUpdate() end)
 	self:HookScript(ItemRefTooltip, 'OnShow', function() self:ItemTooltip('ItemRefTooltip') end)
@@ -49,12 +53,9 @@ function ServTr:OnEnable()
 	self:HookScript(ShoppingTooltip2, 'OnSizeChanged', function() self:ItemTooltip('ShoppingTooltip2') end)
 	self:LoadEmotePatterns()
 
-	self:RegisterEvent('Nameplate_Update')
-	self:RegisterEvent('BubbleFrame_Update')
-
 	if self.db.profile then
-		self.ScheduleEvents.Nameplate_Update = self:ScheduleRepeatingEvent('Nameplate_Update' , self.db.profile.nameplates)
-		self.ScheduleEvents.BubbleFrame_Update = self:ScheduleRepeatingEvent('BubbleFrame_Update' , self.db.profile.bubbles)
+		self.ScheduleTimers.Nameplate_Update = self:ScheduleRepeatingTimer('Nameplate_Update' , self.db.profile.nameplates)
+		self.ScheduleTimers.BubbleFrame_Update = self:ScheduleRepeatingTimer('BubbleFrame_Update' , self.db.profile.bubbles)
 	end
 
 	local db = self.db.profile
@@ -73,7 +74,7 @@ function ServTr:ShotterSecureHook(method)
 	local handler
 	if self.AutoBlizzardHookData[method] then
 		handler = function(...)
-			self:AutoBlizzardHook(method, unpack(arg))
+			self:AutoBlizzardHook(method, ...)
 		end
 	end
 	self:SecureHook(method, handler)
@@ -97,7 +98,7 @@ end
 ---------Utilite functions---------
 
 function ServTr:CopyTable(into, from)
-	for key, val in from do
+	for key, val in pairs(from) do
 		if( type(val) == 'table' ) then
 			if( not into[key] ) then into[key] = {} end
 			self:CopyTable(into[key], val)
@@ -107,7 +108,10 @@ function ServTr:CopyTable(into, from)
 	end
 
 	if (getn(from)) then
-		table.setn(into, getn(from))
+		if (getn(into) ~= getn(from)) then
+			print(getn(into), getn(from))
+			error('not equals length')
+		end
 	end
 
 	return into
@@ -420,6 +424,7 @@ function ServTr:Nameplate_Update()
 					Name:SetText(trans)
 				end
 			end
+
 		end
 	end
 end
@@ -453,7 +458,7 @@ end
 function SplitText(mode, text)
 	if mode then
 		local text_arr = {}
-		for _t in string.gfind(text, '(.-)\10') do
+		for _t in string.gmatch(text, '(.-)\10') do
 			text_arr[getn(text_arr) + 1] = _t
 		end
 		if getn(text_arr) > 0 then
@@ -623,8 +628,7 @@ end
 --				local v = {method, ServTr:GetTableI(arg), this = this}
 ServTr.CallStack = {
 	stack = {},
-	add = function(self, v)
-		local key = table.remove(v, 1)
+	add = function(self, key, ...)
 		if not self.stack[key] then
 			self.stack[key] = {}
 		end
@@ -664,7 +668,7 @@ ServTr.CallStack = {
 				if type(t_this) == 'number' then
 					self:call(name, args)
 				else
-					self:call(name, args, t_this)
+					self:call(name, args)
 				end
 			end
 		end

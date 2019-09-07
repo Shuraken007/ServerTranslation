@@ -112,7 +112,7 @@ function ServTr:AutoCheckObject(obj, list, method, object)
 	end
 end
 
-function ServTr:AutoBlizzardHook(method, ...)
+function ServTr:AutoBlizzardHook(method, event, ...)
 	local data
 	local object
 	if type(method) == 'string' then
@@ -121,6 +121,7 @@ function ServTr:AutoBlizzardHook(method, ...)
 		object, method = method[1], method[2]
 		data = self.AutoBlizzardHookData[object][method]
 	end
+	local arg = {...}
 	if data.event and (not arg[1] or data.event ~= arg[1]) then return end
 	for key, list in pairs(data) do
 		if key ~= 'event' then
@@ -176,7 +177,7 @@ function ServTr:ChatFrame_OnEvent(event)
 		local text = self.Translator:Translate(arg1, self.COMBAT_LOG_list, 'ChatFrame_OnEvent')
 		if text then arg1 = text end
 	end
-	self.hooks.ChatFrame_OnEvent(event)
+	-- self.hooks.ChatFrame_OnEvent(event)
 end
 
 function ServTr:ContainerFrame_GenerateFrame(frame, size, id)
@@ -184,7 +185,7 @@ function ServTr:ContainerFrame_GenerateFrame(frame, size, id)
 	if name then  _G[frame:GetName()..'Name']:SetText(name) end
 end
 
-function ServTr:GroupLootFrame_OnShow()
+function ServTr:GroupLootFrame_OnShow(this, ...)
 	local _, item = GetLootRollItemInfo(this.rollID)
 	local name = self.Translator:Translate(item, 'item_name', 'GroupLootFrame_OnShow')
 			  or self:ItemsWithBonus(item, 'GroupLootFrame_OnShow')
@@ -312,7 +313,7 @@ function ServTr:SendMailFrame_Update()
 	end
 end
 
-function ServTr:StaticPopup_OnUpdate(dialog, elapsed)
+function ServTr:StaticPopup_OnUpdate(this, dialog, elapsed)
 	local PopupString = _G[dialog:GetName()..'Text']
 	if PopupString:GetText() == self[this:GetName()] then return end
 	local replace = self.Translator:Translate(PopupString:GetText(), self.PopupFrame_list, 'StaticPopup_OnUpdate')
@@ -352,7 +353,7 @@ function ServTr:UIErrorsFrame_OnEvent(event, message)
 	self.hooks.UIErrorsFrame_OnEvent(event, message)
 end
 
-function ServTr:UnitFrame_Update()
+function ServTr:UnitFrame_Update(this, ...)
 	local name = self.Translator:Translate(GetUnitName(this.unit), 'creature_Name', 'UnitFrame_Update')
 	if name then this.name:SetText(name) end
 end

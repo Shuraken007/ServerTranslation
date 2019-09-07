@@ -430,8 +430,9 @@ ServTr.Translator = {
   ReplaceDynamicF = function(self, str, key, value)
 	result = gsub(str, key,
 		function(...)
+			local arg={}
 			local t={}
-			for i=1, arg.n do
+			for i=1, #arg do
 				table.insert(t,arg[i])
 			end
 			if getn(t) == 1 then

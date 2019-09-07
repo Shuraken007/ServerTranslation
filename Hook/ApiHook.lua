@@ -9,8 +9,9 @@ ServTr.AutoApiHookData = {
 
 function ServTr:AutoApiHook(method, ...)
    local all_args
+   local arg = {...}
    if arg then
-      all_args = {self.hooks[method](unpack(arg))}
+      all_args = {self.hooks[method](...)}
    else
       all_args = {self.hooks[method]()}
    end

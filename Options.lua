@@ -1,5 +1,5 @@
 ﻿local _G = getfenv()
-local L = AceLibrary('AceLocale-2.2'):new('ServTr')
+local L = LibStub("AceLocale-3.0"):GetLocale('ServTr')
 
 ----------------tables to generate menu-----------------
 
@@ -131,7 +131,7 @@ ServTr.HookFunctions = {
 	AuctionSellItemButton_OnEvent = {},
 	BankFrame_OnEvent = {'UnitName'},
 	ChatFrameEditBox = {funcs = {Insert = {insecure = true}}},
-	ChatFrame_OnEvent = {insecure = true},
+	ChatFrame_OnEvent = {},
 	ClassTrainerFrame_Update = {'UnitName', 'GetTrainerGreetingText'},
 	ContainerFrame_GenerateFrame = {'GetBagName'},
 	CraftFrame_SetSelection = {},
@@ -198,7 +198,7 @@ function ServTr:GetPath(path)
 	if not path then return nil end
 	local db
 	local flag = false
-	for key in string.gfind(path, '(.-)%.') do
+	for key in string.gmatch(path, '(.-)%.') do
 		if not db then
 			db = _G[key]
 			flag = true
@@ -232,8 +232,8 @@ function ServTr:AddEasyMenu(from, to, path)
 		if type(v) == 'table' then
 			to.args[k] = {
 				type = 'group',
-				name = L:HasTranslation(k) and L[k] or k,
-				desc = (L:HasTranslation(k..'_desc') and L[k..'_desc'] or k),
+				name = L[k] or k,
+				desc = L[k..'_desc'] or k,
 			}
 			self:AddEasyMenu(v, to.args[k], path..'.'..k)
 		elseif type(v) == 'string' then
@@ -241,8 +241,8 @@ function ServTr:AddEasyMenu(from, to, path)
 			local opt = v
 			to.args[v] = {
 				type = 'toggle',
-				name = L:HasTranslation(v) and L[v] or v,
-				desc = L:HasTranslation(v..'_desc') and L[v..'_desc'] or v,
+				name = L[v] or v,
+				desc = L[v..'_desc'] or v,
 				get = function() local db = self:GetPath(path) return db[opt] end,
 				set = function() local db = self:GetPath(path) db[opt] = not db[opt] end,
 			}
@@ -258,35 +258,35 @@ function ServTr:AddTranslateMenu(from, to, path)
 		if type(v) == 'table' and (self.HookFunctions[k]) then
 			to.args[k] = {
 				type = 'group',
-				name = L:HasTranslation(k) and L[k] or k,
-				desc = (L:HasTranslation(k..'_desc') and L[k..'_desc'] or k)..self:Compensated(k),
+				name = L[k] or k,
+				desc = (L[k..'_desc'] or k)..self:Compensated(k),
 			}
 			self:AddTranslateMenu(v, to.args[k], path..'.'..k)
 		elseif type(v) == 'table' and (v.object and self.HookFunctions[v.object]) then
 			to.args[k] = {
 				type = 'group',
-				name = L:HasTranslation(v.object..':'..k) and L[v.object..':'..k] or v.object..':'..k,
-				desc = (L:HasTranslation(v.object..':'..k..'_desc') and L[v.object..':'..k..'_desc'] or v.object..':'..k)..self:Compensated(k, v.object),
+				name = L[v.object..':'..k] or v.object..':'..k,
+				desc = (L[v.object..':'..k..'_desc'] or v.object..':'..k)..self:Compensated(k, v.object),
 			}
 			self:AddTranslateMenu(v, to.args[k], path..'.objects.'..v.object..'.'..k)
 		elseif type(v) == 'table' then
 			to.args[k] = {
 				type = 'group',
-				name = L:HasTranslation(k) and L[k] or k,
-				desc = (L:HasTranslation(k..'_desc') and L[k..'_desc'] or k),
+				name = L[k] or k,
+				desc = L[k..'_desc'] or k,
 			}
 			self:AddTranslateMenu(v, to.args[k], path)
 		elseif k ~= 'object' and type(v) == 'string' then
 			local path = path
 			local opt = v
-			local desc = L:HasTranslation(v..'_desc') and L[v..'_desc'] or v
+			local desc = L[v..'_desc'] or v
 			-- spetial for Global Strings
 			if _G[v] and type(_G[v]) == 'string' then
 				desc = _G[v]
 			end
 			to.args[v] = {
 				type = 'toggle',
-				name = L:HasTranslation(v) and L[v] or v,
+				name = L[v] or v,
 				desc = desc,
 				get = function() local db = self:GetPath(path) return db[opt] end,
 				set = function() local db = self:GetPath(path) db[opt] = not db[opt] end,
@@ -296,19 +296,19 @@ function ServTr:AddTranslateMenu(from, to, path)
 end
 
 function ServTr:AddApiMenu(from, to)
-	for k, v in from do
+	for k, v in ipairs(from) do
 		to.args[k] = {
 			type = 'group',
-			name = L:HasTranslation(k..' Functions') and L[k..' Functions'] or k..' Functions',
-			desc = L:HasTranslation(k..' Functions') and L[k..' Functions'] or k..' Functions',
+			name = L[k..' Functions'] or k..' Functions',
+			desc = L[k..' Functions'] or k..' Functions',
 			args = {}
 		}
-		for _, opt in v do
+		for _, opt in pairs(v) do
 			local option = opt
 			to.args[k].args[opt] = {
 				type = 'toggle',
 				name = option,
-				desc =  L:HasTranslation(option..'_desc') and L[option..'_desc'] or option,
+				desc = L[option..'_desc'] or option,
 				get = function() return self.db.profile.api[option] end,
 				set = function()
 					self.db.profile.api[option] = not self.db.profile.api[option]
@@ -320,7 +320,7 @@ function ServTr:AddApiMenu(from, to)
 end
 
 function ServTr:AddLanguages(from, to)
-	for _, lang in from do
+	for _, lang in pairs(from) do
 		local l = lang
 		to.args[l] = {
 			type = 'toggle',
@@ -375,11 +375,11 @@ ServTr.options = {
 						get = function() return ServTr.db.profile.nameplates end,
 						set = function(time)
 							ServTr.db.profile.nameplates = time
-							if ServTr.ScheduleEvents.Nameplate_Update then
-								ServTr:CancelScheduledEvent(ServTr.ScheduleEvents.Nameplate_Update)
+							if ServTr.ScheduleTimers.Nameplate_Update then
+								ServTr:CancelTimer(ServTr.ScheduleTimers.Nameplate_Update)
 							end
 							if time > 0 then
-								ServTr.ScheduleEvents.Nameplate_Update = ServTr:ScheduleRepeatingEvent('Nameplate_Update', time)
+								ServTr.ScheduleTimers.Nameplate_Update = ServTr:ScheduleRepeatingEvent('Nameplate_Update', time)
 							end
 						end,
 					},
@@ -394,11 +394,11 @@ ServTr.options = {
 						get = function() return ServTr.db.profile.bubbles end,
 						set = function(time)
 							ServTr.db.profile.bubbles = time
-							if ServTr.ScheduleEvents.BubbleFrame_Update then
-								ServTr:CancelScheduledEvent(ServTr.ScheduleEvents.BubbleFrame_Update)
+							if ServTr.ScheduleTimers.BubbleFrame_Update then
+								ServTr:CancelTimer(ServTr.ScheduleTimers.BubbleFrame_Update)
 							end
 							if time > 0 then
-								ServTr.ScheduleEvents.BubbleFrame_Update = ServTr:ScheduleRepeatingEvent('BubbleFrame_Update', time)
+								ServTr.ScheduleTimers.BubbleFrame_Update = ServTr:ScheduleRepeatingEvent('BubbleFrame_Update', time)
 							end
 						end,
 					}
@@ -432,7 +432,7 @@ function ServTr:SwitchApi(opt, db)
 			local handler
 			if self.AutoApiHookData[opt] then
 				handler = function(...)
-					return self:AutoApiHook(opt, unpack(arg))
+					return self:AutoApiHook(opt, ...)
 				end
 			end
 			self:Hook(opt, handler, true)
@@ -466,7 +466,7 @@ ServTr.IgnoreCallFuncs = {
 	"ContainerFrame_GenerateFrame",
 }
 
-function ServTr:SwitchBlizzardFuncHook(unhook, method, object)
+function ServTr:SwitchBlizzardFuncHook(unhook, method, object, ...)
 --2 cases - simple function like 'LootFrame_Update' and functions of some object like 'AddMessage' from UIErrorsFrame
 	-- Printd("SwitchBlizzardFuncHook")
 	if not method then Printd('no method') return end
@@ -477,16 +477,17 @@ function ServTr:SwitchBlizzardFuncHook(unhook, method, object)
 	if not object then --I case
 		if self.AutoBlizzardHookData[method] then
 			handler = function(...)
-				self:AutoBlizzardHook(method, unpack(arg))
-				local v = {key, ServTr:GetTableI(arg), this = this}
-				self.CallStack:add(v)
+				self:AutoBlizzardHook(method, ...)
+				-- local v = {key, ServTr:GetTableI(arg), this = this}
+				-- self.CallStack:add(v)
 			end
 		end
 		if not handler and not self:In(method, self.IgnoreCallFuncs) then
 			handler = function(...)
-				self[method](self, unpack(arg))
-				local v = {key, ServTr:GetTableI(arg), this = this}
-				self.CallStack:add(v)
+				-- local arg = {...}
+				self[method](self, ...)
+				-- local v = {key, ServTr:GetTableI(arg), this = this}
+				-- self.CallStack:add(v)
 			end
 		end
 		if unhook and self:IsHooked(method) then
@@ -505,19 +506,28 @@ function ServTr:SwitchBlizzardFuncHook(unhook, method, object)
 			return
 		else
 			if self.AutoBlizzardHookData[object] and self.AutoBlizzardHookData[object][method] then
-				handler = function(...)
-					self:AutoBlizzardHook({method, object}, unpack(arg))
-					local v = {key, ServTr:GetTableI(arg), this = this}
-					self.CallStack:add(v)
+				handler = function(this, ...)
+					-- local arg = {...}
+					self:AutoBlizzardHook({method, object}, ...)
+					-- local v = {key, ServTr:GetTableI(arg), this = this}
+					-- self.CallStack:add(v)
 				end
 			end
 			object = _G[object]
 		end
 		if not handler and not self:In(method, self.IgnoreCallFuncs) then
 			handler = function(...)
-				self[method](self, unpack(arg))
-				local v = {key, ServTr:GetTableI(arg), this = this}
-				self.CallStack:add(v)
+				-- local arg = {...}
+				-- local is_object = (type(this) == 'userobject')
+				self[method](self, ...)
+				-- local v
+				-- if is_object then
+				-- 	v = {key, ServTr:GetTableI(arg), this = this}
+				-- else
+				-- 	table.insert(arg, this)
+				-- 	v = {key, ServTr:GetTableI(arg)}
+				-- end
+				-- self.CallStack:add(v)
 			end
 		end
 		if unhook and self:IsHooked(object, method) then

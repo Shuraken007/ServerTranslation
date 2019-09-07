@@ -1,5 +1,5 @@
 --NewGlobalStrings for easier work with string.find
-local L = AceLibrary('AceLocale-2.2'):new('ServTr')
+local L = LibStub("AceLocale-3.0"):GetLocale('ServTr')
 
 QUEST_LOG_TITLE = '  %s'
 QUEST_WATCH_TITLE = '- %s'
