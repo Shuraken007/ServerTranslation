@@ -457,7 +457,7 @@ function Test()
 			return text[1].." ударил "..text[2]..", а что дальше хрен знает, потеря инфы, если mode=true то функция возвращает набор данных для перевода из строки, иначе склеивает из массива назад."
 		end
 	end
-	-- str = "Kobold Vermin ударил Forest Spider, задев Harvest Golem, использовав Worn Axe и Worn Mace."
+	str = "Kobold Vermin ударил Forest Spider, задев Harvest Golem, использовав Worn Axe и Worn Mace."
 
 	---->>>тест ключей	  k:				[pattern|gs|func] = {v1, v2, ...}
 
@@ -481,7 +481,7 @@ function Test()
 	-- list = { TEST_PATTERN = {"creature_Name", "creature_Name", "creature_Name", "item_name", "item_name", generate_pattern = "TEST_GENERATE_PATTERN" }}
 
 	--harder example
-	-- str = "Вася выигрывает: \124cff9d9d9d\124Hitem:7073:0:0:0\124h[Tundra Necklace]\124h\124r \124cff818181(Бросок \"Не откажусь\": 90)\124r"
+	-- str = "[Loot]: Вася won: \124cff9d9d9d\124Hitem:7073:0:0:0\124h[Tundra Necklace]\124h\124r \124cff818181(Greed - 90)\124r"
 	-- list = {LOOT_ROLL_WON_NO_SPAM_GREED = {nil, nil, nil, nil, nil, nil, nil, "item_name"}}
 
 	--with chain
@@ -489,12 +489,13 @@ function Test()
 	-- list = {LOOT_ROLL_WON_NO_SPAM_GREED = {nil, nil, nil, nil, nil, nil, nil, {ITEM_BONUS = {"item_name"}}}}
 	-- str = "\124cff9d9d9dKobold Vermin\124r\n\124cff1d1d12Forest Spider\124r"
 	-- list = {SplitText = { {COLOR_STR = {nil, "creature_Name"}, all = true}} }
--- str = "Devil's remain: 1/1 (Выполнено)"
--- list = {QUEST_LOG_OBECTIVE_COMPLETE = {ServTr.QUESTLOG_MESSAGE_list}}
+	-- str = "Devil's remain: 1/1 (Выполнено)"
+	-- list = {QUEST_LOG_OBECTIVE_COMPLETE = {ServTr.QUESTLOG_MESSAGE_list}}
 
-	list = {["%s"] = {"creature_Name", COLOR_STR = {nil, "creature_Name"}}}
+	-- list = {["%s"] = {"creature_Name", COLOR_STR = {nil, "creature_Name"}}}
 
+	list = {COLOR_STR = {nil, "creature_Name"}}
 	str = "\124cff9d9d9dKobold Vermin\124r"
-	Printd(str)
-	Printd(ServTr.Translator:Translate(str, list, "Test"))
+	print(str)
+	print(ServTr.Translator:Translate(str, list, "Test"))
 end

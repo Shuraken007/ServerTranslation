@@ -28,7 +28,7 @@ ServTr.AutoBlizzardHookData = {
 	GossipFrameUpdate = {
 		GossipFrameNpcNameText = {{'creature_Name', 'gameobject'}},
 		GossipGreetingText = 'npc_text',
-		GossipTitleButton  = {text_obj_pairs = {f = NUMGOSSIPBUTTONS}, {'quest_title', 'gossip_menu_option', 'gossip_texts'}, todo = GossipResize}
+		GossipTitleButton  = {text_obj_pairs = {f = NUMGOSSIPBUTTONS}, {COLOR_STR = {nil, 'quest_title'}, 'gossip_menu_option', 'gossip_texts'}, todo = GossipResize}
 	},
 	GuildRegistrar_OnShow = {
 		GuildRegistrarFrameNpcNameText = 'creature_Name'
@@ -58,13 +58,17 @@ ServTr.AutoBlizzardHookData = {
 		QuestProgressItem = {text_obj_pairs = {p = 'Name'}, 'item_name'},
 	},
 
-	QuestFrameProgressPanel_OnShow = {
-		QuestProgressTitleText = 'quest_title',
-		QuestProgressText = 'quest_RequestItemsText'
+	QuestFrameProgressPanel = {
+		OnShow = {
+			QuestProgressTitleText = 'quest_title',
+			QuestProgressText = 'quest_RequestItemsText'
+		}
 	},
-	QuestFrameRewardPanel_OnShow = {
-		QuestRewardTitleText = 'quest_title',
-		QuestRewardText = 'quest_OfferRewardText'
+	QuestFrameRewardPanel = {
+		OnShow = {
+			QuestRewardTitleText = 'quest_title',
+			QuestRewardText = 'quest_OfferRewardText'
+		}
 	},
 	QuestFrame_SetPortrait = {
 		QuestFrameNpcNameText = {{'gameobject', 'creature_Name', 'item_name'}}
@@ -99,6 +103,8 @@ function ServTr:AutoCheckObject(obj, list, method, object)
 	end
 	if not obj then return end
 	local text = obj:GetText()
+	-- self.dump(text)
+	ServTr:PrintTab({obj=obj, list=list, method=method, object = object, text=text}, 2)
 	if not text then return nil end
 	-- Printd("text:"..text)
 
@@ -135,6 +141,7 @@ function ServTr:AutoBlizzardHook(method, event, ...)
 				-- Printd("start TextObjPairs for"..key)
 				for _, _, obj in self:TextObjPairs(key, i, postfix, finish) do
 					-- Printd("text_obj_pairs: "..key..i..(postfix or ""))
+
 					self:AutoCheckObject(obj, list, method, object)
 				end
 			else
@@ -143,6 +150,23 @@ function ServTr:AutoBlizzardHook(method, event, ...)
 		end
 	end
 
+end
+
+function ServTr:CompactUnitFrame_UpdateName(frame)
+	local Name = frame.name
+	if self.db.profile.ImaginaryModeOff then
+		if Name.restore then
+			Name:SetText(Name.restore)
+			Name.restore = nil
+		end
+	else
+		local name = Name:GetText()
+		local trans = self.Translator:Translate(name, 'creature_Name', 'CompactUnitFrame_UpdateName')
+		if trans then
+			Name.restore = name
+			Name:SetText(trans)
+		end
+	end
 end
 
 function ServTr:ChatFrame_OnEvent(event)

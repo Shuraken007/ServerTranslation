@@ -42,7 +42,6 @@ function ServTr:OnEnable()
 	self:LoadDb()
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("ServTr", self.options, "servtr")
 
-	-- self:RegisterChatCommand({'/servtr', '/servertranslation'}, self.options)
 	self:HookScript(GameTooltip, 'OnShow', function() self:TooltipOnUpdate() end)
 	self:HookScript(GameTooltip, 'OnSizeChanged', function() self:TooltipOnUpdate() end)
 	self:HookScript(ItemRefTooltip, 'OnShow', function() self:ItemTooltip('ItemRefTooltip') end)
@@ -53,8 +52,8 @@ function ServTr:OnEnable()
 	self:HookScript(ShoppingTooltip2, 'OnSizeChanged', function() self:ItemTooltip('ShoppingTooltip2') end)
 	self:LoadEmotePatterns()
 
+
 	if self.db.profile then
-		self.ScheduleTimers.Nameplate_Update = self:ScheduleRepeatingTimer('Nameplate_Update' , self.db.profile.nameplates)
 		self.ScheduleTimers.BubbleFrame_Update = self:ScheduleRepeatingTimer('BubbleFrame_Update' , self.db.profile.bubbles)
 	end
 
@@ -95,6 +94,16 @@ function ServTr:ADDON_LOADED(name)
 	end
 end
 
+
+function ServTr:test()
+	-- print(type(CompactUnitFrame_UpdateName))
+	hooksecurefunc("CompactUnitFrame_UpdateName", function(frame) self:Nameplate_Update(frame) end)
+	-- local f1 = CompactUnitFrame_UpdateName
+	-- CompactUnitFrame_UpdateName = function (frame)
+	-- 	print(frame:GetName())
+	-- 	f1(frame)
+	-- end
+end
 ---------Utilite functions---------
 
 function ServTr:CopyTable(into, from)
@@ -109,8 +118,7 @@ function ServTr:CopyTable(into, from)
 
 	if (getn(from)) then
 		if (getn(into) ~= getn(from)) then
-			print(getn(into), getn(from))
-			error('not equals length')
+			print('ServTr WARNING: not equals length')
 		end
 	end
 
@@ -282,6 +290,10 @@ function ServTr:TextObjPairs(prefix, start, postfix, finish)
 	return self.TextObjPairsIter, {prefix = prefix or '', postfix = postfix or '', finish = finish}, start or 0
 end
 
+function ServTr:dump(what)
+	ST_DB.debug = {what = what}
+end
+
 --use as debug - full view of classes/objects, print table with all fields and metatable
 function ServTr:PrintTab(obj, max_depth, level, meta_level)
 	if not obj then
@@ -406,29 +418,6 @@ function ServTr:GetNoNameFrame(f)
 	end
 end
 
-function ServTr:Nameplate_Update()
-	local childs = {WorldFrame:GetChildren()}
-	for _, f in pairs(childs) do
-		if not f.frame and self:GetNoNameFrame(f) == 'NameplateFrame' then
-			local _, _, Name = f:GetRegions()
-			if self.db.profile.ImaginaryModeOff then
-				if f.restore then
-					Name:SetText(f.restore)
-					f.restore = nil
-				end
-			else
-				local name = Name:GetText()
-				local trans = self.Translator:Translate(name, 'creature_Name')
-				if trans then
-					f.restore = name
-					Name:SetText(trans)
-				end
-			end
-
-		end
-	end
-end
-
 function ServTr:IsEventBubble(event)
 	local bubbles = {'CHAT_MSG_MONSTER_SAY', 'CHAT_MSG_MONSTER_YELL', 'CHAT_MSG_MONSTER_PARTY'}
 	for _, v in pairs(bubbles) do
@@ -438,17 +427,14 @@ function ServTr:IsEventBubble(event)
 end
 
 function ServTr:BubbleFrame_Update()
-	local db
-	local childs = {WorldFrame:GetChildren()}
-	for _, f in pairs(childs) do
-		if not f.frame and self:GetNoNameFrame(f) == 'ChatBubbleFrame' then
-			local textures = {f:GetRegions()}
-			for _, object in pairs(textures) do
-				if object:GetObjectType() == 'FontString' then
-					local text = object:GetText()
-					local trans = self.Translator:Translate(text, {'script_texts', 'dbscript_string', 'creature_ai_texts'})
-					if trans then object:SetText(trans) end
-				end
+	local chatbubbles = C_ChatBubbles:GetAllChatBubbles()
+	for _, chatbubble in ipairs(chatbubbles) do
+		local textures = {chatbubble:GetRegions()}
+		for _, object in pairs(textures) do
+			if object:GetObjectType() == 'FontString' then
+				local text = object:GetText()
+				local trans = self.Translator:Translate(text, {'script_texts', 'dbscript_string', 'creature_ai_texts'})
+				if trans then object:SetText(trans) end
 			end
 		end
 	end

@@ -87,6 +87,7 @@ ServTr.Dependences = {
 		BankFrame_OnEvent = {'creature_Name'},
 		ChatFrame_OnEvent = {'creature_Name'},
 		ClassTrainerFrame_Update = {'creature_Name', 'mangos_string'},
+		CompactUnitFrame_UpdateName = {'creature_Name'},
 		GossipFrameUpdate = {'npc_text', 'creature_Name', 'gameobject', 'gossip_menu_option', 'gossip_texts'},
 		GuildRegistrar_OnShow = {'creature_Name'},
 		ItemTextFrame_OnEvent = {'gameobject'},
@@ -121,48 +122,49 @@ ServTr.Dependences = {
 --but it's easier to locate it here for correct db work,
 --not so many such strange functions
 ServTr.HookFunctions = {
-	GameTooltip = 'fictitious',
-	ItemRefTooltip = 'fictitious',
-	ShoppingTooltip1 = 'fictitious',
-	ShoppingTooltip2 = 'fictitious',
-	AuctionFrameAuctions_Update = {},
-	AuctionFrameBid_Update = {},
-	AuctionFrameBrowse_Update = {},
-	AuctionSellItemButton_OnEvent = {},
-	BankFrame_OnEvent = {'UnitName'},
-	ChatFrameEditBox = {funcs = {Insert = {insecure = true}}},
-	ChatFrame_OnEvent = {},
-	ClassTrainerFrame_Update = {'UnitName', 'GetTrainerGreetingText'},
-	ContainerFrame_GenerateFrame = {'GetBagName'},
-	CraftFrame_SetSelection = {},
-	GossipFrameUpdate = {'UnitName', 'GetGossipText', 'GetGossipOptions'},
-	GroupLootFrame_OnShow = {'GetLootRollItemInfo'},
-	GuildRegistrar_OnShow = {'UnitName'},
-	InboxFrame_Update = {},
-	ItemTextFrame_OnEvent = {},
-	LootFrame_Update = {'GetLootSlotInfo'},
-	MerchantFrame_UpdateBuybackInfo = {},
-	MerchantFrame_UpdateMerchantInfo = {'UnitName', 'GetMerchantItemInfo'},
-	OpenMail_Update = {'GetInboxInvoiceInfo'},
-	QuestFrameDetailPanel_OnShow = {'GetTitleText', 'GetObjectiveText', 'GetQuestText'},
-	QuestFrameGreetingPanel_OnShow = {'GetGreetingText'},
-	QuestFrameItems_Update = {'GetQuestItemInfo', 'GetQuestLogChoiceInfo', 'GetQuestLogRewardInfo'},
-	QuestFrameProgressItems_Update = {'GetQuestItemInfo'},
-	QuestFrameProgressPanel_OnShow = {'GetTitleText', 'GetProgressText'},
-	QuestFrameRewardPanel_OnShow = {'GetTitleText', 'GetRewardText'},
-	QuestFrame_SetPortrait = {'UnitName'},
-	QuestLog_Update = {'GetQuestLogTitle'},
-	QuestLog_UpdateQuestDetails = {'GetQuestLogTitle', 'GetQuestLogLeaderBoard', 'GetQuestLogQuestText'},
-	QuestWatch_Update = {'GetQuestLogTitle', 'GetQuestLogLeaderBoard'},
-	SendMailFrame_Update = {},
-	StaticPopup_OnUpdate = {},
-	TabardFrame_OnEvent = {'UnitName'},
-	TaxiFrame_OnEvent = {'UnitName'},
-	TradeFrame_UpdatePlayerItem = {'GetTradePlayerItemInfo'},
-	TradeFrame_UpdateTargetItem = {'GetTradeTargetItemInfo'},
-	TradeSkillFrame_SetSelection = {},
-	UIErrorsFrame_OnEvent = {insecure = true},
-	UnitFrame_Update = {'UnitName'}
+	-- GameTooltip = 'fictitious',
+	-- ItemRefTooltip = 'fictitious',
+	-- ShoppingTooltip1 = 'fictitious',
+	-- ShoppingTooltip2 = 'fictitious',
+	-- AuctionFrameAuctions_Update = {},
+	-- AuctionFrameBid_Update = {},
+	-- AuctionFrameBrowse_Update = {},
+	-- AuctionSellItemButton_OnEvent = {},
+	-- BankFrame_OnEvent = {'UnitName'},
+	-- ChatFrameEditBox = {funcs = {Insert = {insecure = true}}},
+	-- ChatFrame_OnEvent = {},
+	-- CompactUnitFrame_UpdateName = {},
+	-- ClassTrainerFrame_Update = {'UnitName', 'GetTrainerGreetingText'},
+	-- ContainerFrame_GenerateFrame = {'GetBagName'},
+	-- CraftFrame_SetSelection = {},
+	-- GossipFrameUpdate = {'UnitName', 'GetGossipText', 'GetGossipOptions'},
+	-- GroupLootFrame_OnShow = {'GetLootRollItemInfo'},
+	-- GuildRegistrar_OnShow = {'UnitName'},
+	-- InboxFrame_Update = {},
+	-- ItemTextFrame_OnEvent = {},
+	-- LootFrame_Update = {'GetLootSlotInfo'},
+	-- MerchantFrame_UpdateBuybackInfo = {},
+	-- MerchantFrame_UpdateMerchantInfo = {'UnitName', 'GetMerchantItemInfo'},
+	-- OpenMail_Update = {'GetInboxInvoiceInfo'},
+	-- QuestFrameDetailPanel_OnShow = {'GetTitleText', 'GetObjectiveText', 'GetQuestText'},
+	-- QuestFrameGreetingPanel_OnShow = {'GetGreetingText'},
+	-- QuestFrameItems_Update = {'GetQuestItemInfo', 'GetQuestLogChoiceInfo', 'GetQuestLogRewardInfo'},
+	-- QuestFrameProgressItems_Update = {'GetQuestItemInfo'},
+	-- QuestFrameProgressPanel = {'GetTitleText', 'GetProgressText', funcs = {OnShow = {}}},
+	QuestFrameRewardPanel = {'GetTitleText', 'GetRewardText', funcs = {OnShow = {}}},
+	-- QuestFrame_SetPortrait = {'UnitName'},
+	-- QuestLog_Update = {'GetQuestLogTitle'},
+	-- QuestLog_UpdateQuestDetails = {'GetQuestLogTitle', 'GetQuestLogLeaderBoard', 'GetQuestLogQuestText'},
+	-- QuestWatch_Update = {'GetQuestLogTitle', 'GetQuestLogLeaderBoard'},
+	-- SendMailFrame_Update = {},
+	-- StaticPopup_OnUpdate = {},
+	-- TabardFrame_OnEvent = {'UnitName'},
+	-- TaxiFrame_OnEvent = {'UnitName'},
+	-- TradeFrame_UpdatePlayerItem = {'GetTradePlayerItemInfo'},
+	-- TradeFrame_UpdateTargetItem = {'GetTradeTargetItemInfo'},
+	-- TradeSkillFrame_SetSelection = {},
+	-- UIErrorsFrame_OnEvent = {insecure = true},
+	-- UnitFrame_Update = {'UnitName'}
 }
 
 ---------Search in Servtr.HookFunctions and return text with api dependence------
@@ -506,9 +508,11 @@ function ServTr:SwitchBlizzardFuncHook(unhook, method, object, ...)
 			return
 		else
 			if self.AutoBlizzardHookData[object] and self.AutoBlizzardHookData[object][method] then
-				handler = function(this, ...)
+				local object_as_str = object
+				handler = function(...)
 					-- local arg = {...}
-					self:AutoBlizzardHook({method, object}, ...)
+					-- ServTr:PrintTab({object=object, method=method}, 2)
+					self:AutoBlizzardHook({object_as_str, method}, ...)
 					-- local v = {key, ServTr:GetTableI(arg), this = this}
 					-- self.CallStack:add(v)
 				end
@@ -532,11 +536,17 @@ function ServTr:SwitchBlizzardFuncHook(unhook, method, object, ...)
 		end
 		if unhook and self:IsHooked(object, method) then
 			self:Unhook(object, method)
-		elseif not unhook and not self:IsHooked(object, method) and (object[method]) then
+		elseif not unhook and not self:IsHooked(object, method) then
 			if insecure then
 				self:Hook(object, method, handler)
 			else
-				self:SecureHook(object, method, handler)
+				if object then
+					ServTr:PrintTab({object=object, method=method, handler=handler}, 1)
+					self:SecureHookScript(object, method, handler)
+				else
+					ServTr:PrintTab({method=method, handler=handler}, 1)
+					self:SecureHook(object, method, handler)
+				end
 			end
 		end
 	end
