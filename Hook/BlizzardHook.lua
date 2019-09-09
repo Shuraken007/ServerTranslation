@@ -49,30 +49,33 @@ ServTr.AutoBlizzardHookData = {
 		MerchantItem = {text_obj_pairs = {p = 'Name'}, 'item_name'},
 		MerchantBuyBackItemName = {{'item_name', ITEM_BONUS = 'item_name'}}
 	},
-	QuestFrameDetailPanel_OnShow = {
-		QuestTitleText = 'quest_title',
-		QuestObjectiveText = 'quest_objectives',
-		QuestDescription = 'quest_details'
+	QuestFrameDetailPanel = {
+		OnShow = {
+			QuestInfoTitleHeader = 'quest_title',
+			QuestInfoObjectivesText = 'quest_objectives',
+			QuestInfoDescriptionText = 'quest_details',
+			custom_func = function() ServTr:QuestFrameItems_Update() end,
+		},
 	},
-	QuestFrameProgressItems_Update = {
-		QuestProgressItem = {text_obj_pairs = {p = 'Name'}, 'item_name'},
-	},
-
 	QuestFrameProgressPanel = {
 		OnShow = {
 			QuestProgressTitleText = 'quest_title',
 			QuestProgressText = 'quest_RequestItemsText'
-		}
+		},
 	},
 	QuestFrameRewardPanel = {
 		OnShow = {
-			QuestRewardTitleText = 'quest_title',
-			QuestRewardText = 'quest_OfferRewardText'
-		}
+			QuestInfoTitleHeader = 'quest_title',
+			QuestInfoRewardText = 'quest_OfferRewardText',
+			custom_func = function() ServTr:QuestFrameItems_Update() end,
+		},
 	},
 	QuestFrame_SetPortrait = {
 		QuestFrameNpcNameText = {{'gameobject', 'creature_Name', 'item_name'}}
 	},
+    QuestFrameProgressItems_Update = {
+        QuestProgressItem = {text_obj_pairs = {field = 'Name'}, 'item_name'},
+    },
 	QuestLog_UpdateQuestDetails = {
 		QuestLogQuestTitle = 'quest_title',
 		QuestLogObjectivesText = 'quest_objectives',
@@ -98,13 +101,13 @@ function ServTr:AutoCheckObject(obj, list, method, object)
 	local gettext_db = {}
 	local translate_text = {}
 	if type(obj) == 'string' then
-		-- Printd("object:"..obj)
+		-- print("object: "..obj)
 		obj = _G[obj]
 	end
 	if not obj then return end
+	-- ServTr:PrintTab({obj=obj, list=list, method=method, object = object, text=text}, 2)
 	local text = obj:GetText()
 	-- self.dump(text)
-	ServTr:PrintTab({obj=obj, list=list, method=method, object = object, text=text}, 2)
 	if not text then return nil end
 	-- Printd("text:"..text)
 
@@ -121,6 +124,7 @@ end
 function ServTr:AutoBlizzardHook(method, event, ...)
 	local data
 	local object
+	local custom_func
 	if type(method) == 'string' then
 		data = self.AutoBlizzardHookData[method]
 	elseif type(method) == 'table' then
@@ -134,22 +138,27 @@ function ServTr:AutoBlizzardHook(method, event, ...)
 			if type(list) == 'string' then
 				list = {list}
 			end
-			if list.text_obj_pairs then
-				local i = 1 or (type(list.text_obj_pairs) == 'table' and list.text_obj_pairs.i)
-				local postfix = (type(list.text_obj_pairs) == 'table' and list.text_obj_pairs.p)
-				local finish = (type(list.text_obj_pairs) == 'table' and list.text_obj_pairs.f)
-				-- Printd("start TextObjPairs for"..key)
-				for _, _, obj in self:TextObjPairs(key, i, postfix, finish) do
-					-- Printd("text_obj_pairs: "..key..i..(postfix or ""))
+			if type(list) == 'table' then
+				if list.text_obj_pairs then
+					local i = 1 or (type(list.text_obj_pairs) == 'table' and list.text_obj_pairs.i)
+					local postfix = (type(list.text_obj_pairs) == 'table' and list.text_obj_pairs.p)
+					local finish = (type(list.text_obj_pairs) == 'table' and list.text_obj_pairs.f)
+					local field = (type(list.text_obj_pairs) == 'table' and list.text_obj_pairs.field)
+					-- Printd("start TextObjPairs for"..key)
+					for _, _, obj in self:TextObjPairs(key, i, postfix, finish, field) do
+						-- Printd("text_obj_pairs: "..key..i..(postfix or ""))
 
-					self:AutoCheckObject(obj, list, method, object)
+						self:AutoCheckObject(obj, list, method, object)
+					end
+				else
+					self:AutoCheckObject(key, list, method, object)
 				end
-			else
-				self:AutoCheckObject(key, list, method, object)
 			end
 		end
 	end
-
+	if data.custom_func then
+		data.custom_func()
+	end
 end
 
 function ServTr:CompactUnitFrame_UpdateName(frame)
@@ -280,8 +289,10 @@ function ServTr:QuestFrameGreetingPanel_OnShow()
 	end
 end
 
-function ServTr:QuestFrameItems_Update(questState)
-	for i, text, str in self:TextObjPairs(questState..'Item', 1, 'Name') do
+-- I can't hook this Blizzard func, so I call it on custom_func
+function ServTr:QuestFrameItems_Update()
+	local prefix = 'QuestInfoRewardsFrameQuestInfoItem'
+	for i, text, str in self:TextObjPairs(prefix, 1, nil, nil, 'Name') do
 		local trans = self.Translator:Translate(text, 'item_name', 'QuestFrameItems_Update')
 		if trans then str:SetText(trans) end
 	end

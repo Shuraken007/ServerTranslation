@@ -274,6 +274,10 @@ function ServTr.TextObjPairsIter(s, iter)
 	iter = iter+1
 	local obj = _G[s.prefix..iter..s.postfix]
 	if not obj then return nil end
+	if s.field then
+		obj = obj[s.field]
+	end
+	if not obj then return nil end
 	local text = obj:GetText()
 	if not text then
 		if not s.finish or iter >= s.finish then
@@ -285,9 +289,9 @@ function ServTr.TextObjPairsIter(s, iter)
 	return iter, text, obj
 end
 
-function ServTr:TextObjPairs(prefix, start, postfix, finish)
+function ServTr:TextObjPairs(prefix, start, postfix, finish, field)
 	if start then start = start - 1 end
-	return self.TextObjPairsIter, {prefix = prefix or '', postfix = postfix or '', finish = finish}, start or 0
+	return self.TextObjPairsIter, {prefix = prefix or '', postfix = postfix or '', finish = finish, field = field}, start or 0
 end
 
 function ServTr:dump(what)
