@@ -494,8 +494,10 @@ function Test()
 
 	-- list = {["%s"] = {"creature_Name", COLOR_STR = {nil, "creature_Name"}}}
 
-	list = {COLOR_STR = {nil, "creature_Name"}}
-	str = "\124cff9d9d9dKobold Vermin\124r"
+	-- list = {COLOR_STR = {nil, "creature_Name"}}
+	-- str = "\124cff9d9d9dKobold Vermin\124r"
+	str = "Rest and Relaxation"
+	list = ServTr.PopupFrame_list
 	print(str)
 	print(ServTr.Translator:Translate(str, list, "Test"))
 end

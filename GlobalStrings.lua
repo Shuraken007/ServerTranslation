@@ -45,15 +45,7 @@ ServTr.UI_ERROR_MESSAGE_list = {
 	SPELL_EQUIPPED_ITEM_NOSPACE = 'item_name'
 }
 
-ServTr.PopupFrame_list = {
-	ABANDON_QUEST_CONFIRM = 'quest_title',
-	ABANDON_QUEST_CONFIRM_WITH_ITEMS = {'quest_title', 'item_name'},
-	DELETE_GOOD_ITEM = 'item_name',
-	DELETE_ITEM = 'item_name',
-	DELETE_MAIL_CONFIRMATION = 'item_name'
-	--QUEST_ACCEPT -- тест
-	--REPLACE_ENCHANT -- тест
-}
+ServTr.PopupFrame_list = {'quest_title', 'item_name'}
 
 ServTr.COMBAT_LOG_list = {
 	AURAADDEDOTHERHARMFUL = 'creature_Name', -- "%s is afflicted by %s."; -- Combat log text for aura events

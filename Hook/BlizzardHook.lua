@@ -80,7 +80,8 @@ ServTr.AutoBlizzardHookData = {
 		QuestLogQuestTitle = 'quest_title',
 		QuestLogObjectivesText = 'quest_objectives',
 		QuestLogQuestDescription = 'quest_details',
-		QuestLogObjective = {text_obj_pairs = true, {'quest_EndText', QUEST_LOG_OBECTIVE_COMPLETE = {ServTr.QUESTLOG_MESSAGE_list}, ["(.+)"] = {ServTr.QUESTLOG_MESSAGE_list}}}
+		QuestLogObjective = {text_obj_pairs = true, {'quest_EndText', QUEST_LOG_OBECTIVE_COMPLETE = {ServTr.QUESTLOG_MESSAGE_list}, ["(.+)"] = {ServTr.QUESTLOG_MESSAGE_list}}},
+		custom_func = function() ServTr:QuestInfo_ShowRewards() end,
 	},
 	TabardFrame_OnEvent = {
 		TaxiMerchant = 'creature_Name',
@@ -298,6 +299,15 @@ function ServTr:QuestFrameItems_Update()
 	end
 end
 
+-- I can't hook this Blizzard func, so I call it on custom_func
+function ServTr:QuestInfo_ShowRewards()
+	local prefix = 'QuestLogItem'
+	for i, text, str in self:TextObjPairs(prefix, 1, nil, nil, 'Name') do
+		local trans = self.Translator:Translate(text, 'item_name', 'QuestInfo_ShowRewards')
+		if trans then str:SetText(trans) end
+	end
+end
+
 function ServTr:QuestLog_Update()
 	for i, text, str in self:TextObjPairs('QuestLogTitle') do
 		local questCheck = _G['QuestLogTitle'..i..'Check']
@@ -348,16 +358,15 @@ function ServTr:SendMailFrame_Update()
 	end
 end
 
-function ServTr:StaticPopup_OnUpdate(this, dialog, elapsed)
-	local PopupString = _G[dialog:GetName()..'Text']
-	if PopupString:GetText() == self[this:GetName()] then return end
-	local replace = self.Translator:Translate(PopupString:GetText(), self.PopupFrame_list, 'StaticPopup_OnUpdate')
-	if replace then
-		PopupString:SetText(replace)
-		StaticPopup_Resize(dialog, dialog.which)
+function ServTr:StaticPopup_Show(which, text_arg1, text_arg2, data, insertedFrame)
+	local list = self.PopupFrame_list
+	local translated_arg1 = self.Translator:Translate(text_arg1, list, 'StaticPopup_Show')
+	local translated_arg2 = self.Translator:Translate(text_arg2, list, 'StaticPopup_Show')
+	if translated_arg1 or translated_arg2 then
+		StaticPopup_Show(which, translated_arg1 or text_arg1, translated_arg2 or text_arg2, data, insertedFrame)
 	end
-	self[this:GetName()] = PopupString:GetText()
 end
+
 
 function ServTr:TradeFrame_UpdatePlayerItem(id)
 	if id ~= 7 then
@@ -375,17 +384,21 @@ function ServTr:TradeFrame_UpdateTargetItem(id)
 	end
 end
 
-function ServTr:UIErrorsFrame_OnEvent(event, message)
-	local list, db
-	if event == 'UI_INFO_MESSAGE' then
-		list = self.UI_INFO_MESSAGE_list
-		db = 'areatrigger_teleport'
-	elseif event == 'UI_ERROR_MESSAGE' then
-		list = self.UI_ERROR_MESSAGE_list
-		db = 'mangos_string'
+function ServTr:OnEvent(frame, event, message, ...)
+	if frame == UIErrorsFrame then
+		local list, db
+		if event == 'UI_INFO_MESSAGE' then
+			print('here1')
+			list = self.UI_INFO_MESSAGE_list
+			db = 'areatrigger_teleport'
+		elseif event == 'UI_ERROR_MESSAGE' then
+			print('here1')
+			list = self.UI_ERROR_MESSAGE_list
+			db = 'mangos_string'
+		end
+		print(message)
+		message = self.Translator:Translate(message, list, 'UIErrorsFrame_OnEvent') or self.Translator:Translate(message, db, 'UIErrorsFrame_OnEvent') or message
 	end
-	message = self.Translator:Translate(message, list, 'UIErrorsFrame_OnEvent') or self.Translator:Translate(message, db, 'UIErrorsFrame_OnEvent') or message
-	self.hooks.UIErrorsFrame_OnEvent(event, message)
 end
 
 function ServTr:UnitFrame_Update(this, ...)
