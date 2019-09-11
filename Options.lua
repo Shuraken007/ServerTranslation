@@ -138,14 +138,14 @@ ServTr.HookFunctions = {
 	--[[       ]]ClassTrainerFrame_Update = {'UnitName', 'GetTrainerGreetingText'},
 	--[[       ]]ContainerFrame_GenerateFrame = {'GetBagName'},
 	--[[       ]]CraftFrame_SetSelection = {},
-	--[[       ]]GossipFrameUpdate = {'UnitName', 'GetGossipText', 'GetGossipOptions'},
+	--[[checked]]GossipFrameUpdate = {'UnitName', 'GetGossipText', 'GetGossipOptions'},
 	--[[       ]]GroupLootFrame_OnShow = {'GetLootRollItemInfo'},
 	--[[       ]]GuildRegistrar_OnShow = {'UnitName'},
 	--[[       ]]InboxFrame_Update = {},
 	--[[       ]]ItemTextFrame_OnEvent = {},
-	--[[       ]]LootFrame_Update = {'GetLootSlotInfo'},
-	--[[       ]]MerchantFrame_UpdateBuybackInfo = {},
-	--[[       ]]MerchantFrame_UpdateMerchantInfo = {'UnitName', 'GetMerchantItemInfo'},
+	--[[checked]]LootFrame_Update = {'GetLootSlotInfo'},
+	--[[checked]]MerchantFrame_UpdateBuybackInfo = {},
+	--[[chcked]]MerchantFrame_UpdateMerchantInfo = {'UnitName', 'GetMerchantItemInfo'},
 	--[[       ]]OpenMail_Update = {'GetInboxInvoiceInfo'},
 	--[[checked]]QuestFrameDetailPanel = {'GetTitleText', 'GetObjectiveText', 'GetQuestText', funcs = {OnShow = {}}},
 	--[[checked]]QuestFrameGreetingPanel_OnShow = {'GetGreetingText'},
@@ -165,7 +165,7 @@ ServTr.HookFunctions = {
 	--[[       ]]TradeFrame_UpdatePlayerItem = {'GetTradePlayerItemInfo'},
 	--[[       ]]TradeFrame_UpdateTargetItem = {'GetTradeTargetItemInfo'},
 	--[[       ]]TradeSkillFrame_SetSelection = {},
-	--[[       ]]UIErrorsFrame = {funcs = {OnEvent = {}}},
+	--[[checked]]UIErrorsFrame = {funcs = {OnEvent = {}}}, --possible bug with Clearing messages ?
 	--[[       ]]UnitFrame_Update = {'UnitName'},
 }
 
@@ -472,8 +472,7 @@ ServTr.IgnoreCallFuncs = {
 
 function ServTr:SwitchBlizzardFuncHook(unhook, method, object, ...)
 --2 cases - simple function like 'LootFrame_Update' and functions of some object like 'AddMessage' from UIErrorsFrame
-	-- Printd("SwitchBlizzardFuncHook")
-	if not method then Printd('no method') return end
+	if not method then print('no method') return end
 	local insecure
 	local handler
 	local key = method
@@ -544,7 +543,6 @@ function ServTr:SwitchBlizzardFuncHook(unhook, method, object, ...)
 				if object then
 					self:SecureHookScript(object, method, handler)
 				else
-					print('secure')
 					self:SecureHook(object, method, handler)
 				end
 			end

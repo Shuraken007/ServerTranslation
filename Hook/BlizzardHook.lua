@@ -384,20 +384,29 @@ function ServTr:TradeFrame_UpdateTargetItem(id)
 	end
 end
 
-function ServTr:OnEvent(frame, event, message, ...)
+function ServTr:OnEvent(frame, event, ...)
+	local args = {...}
+	local message_index = 1 --default
 	if frame == UIErrorsFrame then
 		local list, db
 		if event == 'UI_INFO_MESSAGE' then
-			print('here1')
+			message_index = 2
 			list = self.UI_INFO_MESSAGE_list
 			db = 'areatrigger_teleport'
 		elseif event == 'UI_ERROR_MESSAGE' then
-			print('here1')
+			message_index = 2
 			list = self.UI_ERROR_MESSAGE_list
 			db = 'mangos_string'
 		end
-		print(message)
-		message = self.Translator:Translate(message, list, 'UIErrorsFrame_OnEvent') or self.Translator:Translate(message, db, 'UIErrorsFrame_OnEvent') or message
+
+		local message = args[message_index]
+		message = self.Translator:Translate(message, list, 'UIErrorsFrame_OnEvent') or self.Translator:Translate(message, db, 'UIErrorsFrame_OnEvent')
+
+		if message then
+			args[message_index] = message
+			frame:Clear()
+			frame:OnEvent(event, unpack(args))
+		end
 	end
 end
 
